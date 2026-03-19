@@ -9,11 +9,13 @@ Send article URLs to a Telegram bot, store them once, and expose the saved items
 3. Start the stack:
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 The API runs on `http://localhost:8000` and the RSS feed is available at `http://localhost:8000/rss`.
 The API runs on `http://localhost:8856` and the RSS feed is available at `http://localhost:8856/rss`.
+
+Both services use Docker's `unless-stopped` restart policy. If Docker Desktop is set to launch when you log in, the stack will come back automatically after a reboot once you have started it at least once.
 
 ## Environment
 
