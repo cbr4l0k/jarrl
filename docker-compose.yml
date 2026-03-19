@@ -1,0 +1,28 @@
+services:
+  api:
+    build: .
+    command: ["uvicorn", "jarrl.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8856:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:///./data/jarrl.sqlite}
+      FEED_BASE_URL: ${FEED_BASE_URL:-http://localhost:8856/rss}
+    volumes:
+      - jarrl-data:/app/data
+
+  bot:
+    build: .
+    command: ["python", "-m", "jarrl.bot"]
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      ALLOWED_TELEGRAM_USER_ID: ${ALLOWED_TELEGRAM_USER_ID}
+      API_BASE_URL: ${API_BASE_URL:-http://api:8000}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:///./data/jarrl.sqlite}
+      FEED_BASE_URL: ${FEED_BASE_URL:-http://localhost:8856/rss}
+    depends_on:
+      - api
+    volumes:
+      - jarrl-data:/app/data
+
+volumes:
+  jarrl-data:
