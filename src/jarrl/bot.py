@@ -66,7 +66,21 @@ async def main() -> None:
     bot = Bot(token=get_bot_token())
     dispatcher = Dispatcher()
     dispatcher.message.register(handle_url)
-    await dispatcher.start_polling(bot)
+
+    max_retries = 60
+    for attempt in range(max_retries):
+        try:
+            await dispatcher.start_polling(bot)
+            return
+        except Exception as exc:
+            if attempt == max_retries - 1:
+                raise
+            delay = min(2 ** attempt, 30)
+            print(
+                f"Polling failed ({exc.__class__.__name__}), "
+                f"retrying in {delay}s (attempt {attempt + 1}/{max_retries})..."
+            )
+            await asyncio.sleep(delay)
 
 
 if __name__ == "__main__":

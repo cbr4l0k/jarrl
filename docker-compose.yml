@@ -10,6 +10,12 @@ services:
       FEED_BASE_URL: ${FEED_BASE_URL:-http://localhost:8856/rss}
     volumes:
       - jarrl-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/rss')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   bot:
     build: .
@@ -22,7 +28,8 @@ services:
       DATABASE_URL: ${DATABASE_URL:-sqlite:///./data/jarrl.sqlite}
       FEED_BASE_URL: ${FEED_BASE_URL:-http://localhost:8856/rss}
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     volumes:
       - jarrl-data:/app/data
 
